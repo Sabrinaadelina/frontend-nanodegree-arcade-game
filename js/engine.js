@@ -12,7 +12,6 @@
  * This engine makes the canvas' context (ctx) object globally available to make 
  * writing app.js a little simpler to work with.
  */
-
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -24,9 +23,11 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
+
     canvas.width = 505;
     canvas.height = 606;
     doc.body.appendChild(canvas);
+    
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -47,6 +48,7 @@ var Engine = (function(global) {
         update(dt);
         render();
 
+
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
@@ -63,9 +65,11 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
+
         reset();
         lastTime = Date.now();
         main();
+        checkCollisions();
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -79,7 +83,8 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
+
     }
 
     /* This is called by the update function and loops through all of the
@@ -87,7 +92,7 @@ var Engine = (function(global) {
      * their update() methods. It will then call the update function for your
      * player object. These update methods should focus purely on updating
      * the data/properties related to the object. Do your drawing in your
-     * render methods.
+     * render methods. 
      */
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
@@ -95,6 +100,17 @@ var Engine = (function(global) {
         });
         player.update();
     }
+    // check if the player has been touched by an enemy
+    function checkCollisions() {
+        allEnemies.forEach(enemy => {
+            if ((player.y - enemy.y < 30 && player.y - enemy.y > -30) &&
+                (player.x - enemy.x < 50 && player.x - enemy.x > -50)) {
+              reset();  
+            
+            }
+        })
+    }
+
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -102,24 +118,24 @@ var Engine = (function(global) {
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
      */
+
     function render() {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
+                'images/water-block.png', // Top row is water
+                'images/stone-block.png', // Row 1 of 3 of stone
+                'images/stone-block.png', // Row 2 of 3 of stone
+                'images/stone-block.png', // Row 3 of 3 of stone
+                'images/grass-block.png', // Row 1 of 2 of grass
+                'images/grass-block.png' // Row 2 of 2 of grass
             ],
             numRows = 6,
             numCols = 5,
             row, col;
-        
         // Before drawing, clear existing canvas
-        ctx.clearRect(0,0,canvas.width,canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -161,7 +177,14 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        player.reset();
+       allEnemies.forEach(function(enemy) {
+           enemy.reset();
+           
+
+        });
+
+
     }
 
     /* Go ahead and load all of the images we know we're going to need to
